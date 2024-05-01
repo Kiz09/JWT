@@ -54,7 +54,7 @@ public class JWTService {
 
     }
 
-    private String generateToken(User user){
+    public String generateToken(User user){
 
         String token = Jwts
                 .builder()
