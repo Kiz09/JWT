@@ -32,5 +32,13 @@ public class AuthController {
 
     }
 
+    @GetMapping("/check")
+    public ResponseEntity<String> check(){
+
+        return ResponseEntity.ok("Secured");
+
+    }
+
+
 
 }
