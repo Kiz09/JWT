@@ -1,6 +1,7 @@
 package com.kiz.springJwt.config;
 
 import com.kiz.springJwt.filter.JwtAuthenticationFilter;
+import com.kiz.springJwt.model.Role.Role;
 import com.kiz.springJwt.service.UserDetailsServiceImp;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +43,8 @@ public class SecurityConfig {
                 .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) //error screen browser new window
                 .authorizeHttpRequests(req-> req.requestMatchers("/login/**", "/register/**")
                         .permitAll()
-                        //.requestMatchers("/h2-jwt/**") // Ignorar la URL "h2-jwt"
-                        //.permitAll()
+                        .requestMatchers("/h2-jwt/**").permitAll() // Ignorar la URL "h2-jwt"
+                        .requestMatchers("/admin").hasAuthority("ADMIN")
                         .anyRequest()
                         .authenticated())
                         .userDetailsService(userDetailsServiceImp)

@@ -40,5 +40,12 @@ public class AuthController {
     }
 
 
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminOnly(){
+
+        return ResponseEntity.ok("Hello Admnin");
+
+    }
+
 
 }
