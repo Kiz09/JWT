@@ -1,5 +1,6 @@
 package com.kiz.springJwt.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,5 +8,10 @@ import lombok.Data;
 @AllArgsConstructor
 public class AuthenticationResponse {
 
-    private String token;
+    @JsonProperty("access-token")
+    private String accessToken;
+
+    @JsonProperty("refresh-token")
+    private String refreshToken;
+
 }

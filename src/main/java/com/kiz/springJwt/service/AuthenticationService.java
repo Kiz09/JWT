@@ -3,8 +3,6 @@ package com.kiz.springJwt.service;
 import com.kiz.springJwt.Repository.UserRepository;
 import com.kiz.springJwt.model.AuthenticationResponse;
 import com.kiz.springJwt.model.User;
-import java.net.PasswordAuthentication;
-import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,9 +35,11 @@ public class AuthenticationService {
 
         user = userRepository.save(user);
 
-        String token = jwtService.generateToken(user);
+        String accessToken = jwtService.generateAccesToken(user);
 
-        return new AuthenticationResponse(token);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new AuthenticationResponse(accessToken, refreshToken);
     }
 
     public AuthenticationResponse login (User request){
@@ -48,9 +48,11 @@ public class AuthenticationService {
 
         User user = userRepository.findByUserName(request.getUsername()).orElseThrow();
 
-        String token = jwtService.generateToken(user);
+        String accessToken = jwtService.generateAccesToken(user);
 
-        return new AuthenticationResponse(token);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new AuthenticationResponse(accessToken, refreshToken);
     }
 
 

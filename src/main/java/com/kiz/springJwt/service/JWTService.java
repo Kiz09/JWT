@@ -7,6 +7,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,14 @@ import javax.crypto.SecretKey;
 @Service
 public class JWTService {
 
-    private final String SECRET_KEY="fb9ae3a7a67f673400d9b728a05e9776b29c73946ca01d9bb486b892db299014";
+    @Value("${application.security.jwt.secret-key}")
+    private String SECRET_KEY;
+
+    @Value("${application.security.jwt.access-token}")
+    private Long ACCESS_TOKEN;
+
+    @Value("${application.security.jwt.refresh-token}")
+    private Long REFRESH_TOKEN;
 
     public <T> T extractClaim(String token, Function<Claims, T> resolver){
         Claims claims = extractAllClaims(token);
@@ -54,18 +63,29 @@ public class JWTService {
 
     }
 
-    public String generateToken(User user){
+    private String generateToken(User user, long expirationTime){
 
-        String token = Jwts
+        return Jwts
                 .builder()
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 24*60*60*1000))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigninKey())
                 .compact();
-
-        return token;
     }
+
+    public String generateAccesToken(User user){
+
+        return generateToken(user, ACCESS_TOKEN); //Set now for 10 seconds, 24 hrs is 8640000
+    }
+
+    public String generateRefreshToken(User user){
+
+        return generateToken(user, REFRESH_TOKEN); //Set now for 30 seconds, 7 days is 60480000
+    }
+
+
+
 
     private SecretKey getSigninKey() {
         byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
