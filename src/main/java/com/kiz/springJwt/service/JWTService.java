@@ -108,7 +108,10 @@ public class JWTService {
 
         String userName  =  extractUsername(token);
 
-        return (userName.equals(user.getUsername())  && !isTokenExpired(token));
+        boolean isValidRefreshToken = tokenRepository.findByRefreshToken(token).map(t-> !t.isLoggedOut()).orElse(false);
+
+
+        return (userName.equals(user.getUsername())  && !isTokenExpired(token) && isValidRefreshToken);
 
     }
 }

@@ -107,34 +107,37 @@ public class AuthenticationService {
     }
 
 
-//    public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) {
-//
-//        // extract token from auth header
-//        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-//
-//        if(Objects.isNull(authHeader) || !authHeader.startsWith("Bearer ")){
-//            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-//        }
-//
-//        String token = authHeader.substring(7);
-//
-//        // extract username from token
-//        String username = jwtService.extractUsername(token);
-//
-//        //check if the user exist in DDBB
-//        //Optional<User> user = userRepository.findByUserName(username);
-//        User user = userRepository.findByUserName(username).orElseThrow(()-> new UsernameNotFoundException("User not found"));
-//
-//        //Check if refresh token is valid
-//        if(jwtService.isValidRefreshToken(token, user)){
-//                String accesToken = jwtService.generateAccesToken(user);
-//                String refreshToken = jwtService.generateRefreshToken(user);
-//
-//
-//            return new ResponseEntity(new AuthenticationResponse(accesToken, refreshToken), HttpStatus.OK);
-//        }
-//
-//        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
-//
-//    }
+    public ResponseEntity refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        // extract token from auth header
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if(Objects.isNull(authHeader) || !authHeader.startsWith("Bearer ")){
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+
+        // extract username from token
+        String username = jwtService.extractUsername(token);
+
+        //check if the user exist in DDBB
+        //Optional<User> user = userRepository.findByUserName(username);
+        User user = userRepository.findByUserName(username).orElseThrow(()-> new UsernameNotFoundException("User not found"));
+
+        //Check if refresh token is valid
+        if(jwtService.isValidRefreshToken(token, user)){
+
+            String accessToken = jwtService.generateAccesToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+
+            revokeAllTokenByUser(user);
+            saveUserToken(accessToken, refreshToken, user);
+
+            return new ResponseEntity(new AuthenticationResponse(accessToken, refreshToken), HttpStatus.OK);
+        }
+
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+
+    }
 }

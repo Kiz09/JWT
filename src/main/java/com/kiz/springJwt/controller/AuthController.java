@@ -50,12 +50,12 @@ public class AuthController {
     }
 
 
-//    @PostMapping("/refreh_token")
-//    public ResponseEntity refrehToken(HttpServletRequest request, HttpServletResponse response){
-//
-//        return authService.refreshToken(request, response);
-//
-//    }
+    @PostMapping("/refresh_token")
+    public ResponseEntity refrehToken(HttpServletRequest request, HttpServletResponse response){
+
+        return authService.refreshToken(request, response);
+
+    }
 
 
 }
