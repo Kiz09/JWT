@@ -1,12 +1,15 @@
 package com.kiz.springJwt.service;
 
+import com.kiz.springJwt.Repository.TokenRepository;
 import com.kiz.springJwt.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import java.util.Optional;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +29,12 @@ public class JWTService {
     @Value("${application.security.jwt.refresh-token}")
     private Long REFRESH_TOKEN;
 
+    private TokenRepository tokenRepository;
+
+    public JWTService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> resolver){
         Claims claims = extractAllClaims(token);
 
@@ -43,7 +52,9 @@ public class JWTService {
 
         String userName  =  extractUsername(token);
 
-        return (userName.equals(user.getUsername())  && !isTokenExpired(token));
+        boolean isValidToken = tokenRepository.findByAccessToken(token).map(t-> !t.isLoggedOut()).orElse(false);
+
+        return (userName.equals(user.getUsername())  && !isTokenExpired(token) && isValidToken);
 
     }
 
@@ -93,4 +104,11 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public boolean isValidRefreshToken(String token, User user) {
+
+        String userName  =  extractUsername(token);
+
+        return (userName.equals(user.getUsername())  && !isTokenExpired(token));
+
+    }
 }
